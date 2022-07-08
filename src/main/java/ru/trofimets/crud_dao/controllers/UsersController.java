@@ -1,0 +1,88 @@
+package ru.trofimets.crud_dao.controllers;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import ru.trofimets.crud_dao.model.User;
+import ru.trofimets.crud_dao.service.UserService;
+import ru.trofimets.crud_dao.util.UserValidator;
+
+import javax.validation.Valid;
+import java.sql.SQLException;
+
+
+@Controller
+@RequestMapping("/users")
+public class UsersController {
+
+    private final UserService userService;
+    private final UserValidator userValidator;
+
+    @Autowired
+    public UsersController(UserService userService, UserValidator userValidator) {
+        this.userService = userService;
+        this.userValidator = userValidator;
+    }
+
+
+    @GetMapping()
+    public String index(Model model) {
+        model.addAttribute("users", userService.index());
+        return "users/index";
+    }
+
+    @GetMapping("/{id}")
+    public String show(@PathVariable("id") int id, Model model) throws SQLException {
+        model.addAttribute("user", userService.show(id));
+        return "users/show";
+    }
+
+    @GetMapping("/new")
+    public String newUser(Model model) {
+        model.addAttribute("user", new User());
+        return "users/new";
+    }
+
+    @PostMapping
+    public String create(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
+        userValidator.validate(user,bindingResult);
+        if(bindingResult.hasErrors()){
+            return "users/new";
+        }
+        userService.save(user);
+        return "redirect:/users/";
+    }
+
+
+    @GetMapping("/{id}/edit")
+    public String edit(Model model, @PathVariable("id") int id) throws SQLException {
+        model.addAttribute("user", userService.show(id));
+        return "users/edit";
+    }
+
+    @PatchMapping("/{id}")
+    public String update(@ModelAttribute("user") @Valid User user,BindingResult bindingResult, @PathVariable("id") int id) throws SQLException {
+        userValidator.validate(user,bindingResult);
+        if(bindingResult.hasErrors()){
+            return "users/edit";
+        }
+        userService.update(id, user);
+        return "redirect:/users";
+    }
+
+        @GetMapping("/delete/{id}")
+    public String remove(@ModelAttribute("id") int id) {
+        userService.delete(id);
+        return "redirect:/users/";
+    }
+
+
+    @DeleteMapping("/{id}")
+    public String delete(@ModelAttribute("id") int id) {
+        userService.delete(id);
+        return "redirect:/users/";
+    }
+}
