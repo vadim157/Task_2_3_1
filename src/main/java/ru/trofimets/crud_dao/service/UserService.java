@@ -9,10 +9,8 @@ import java.util.Optional;
 public interface UserService {
 
     List<User> index();
-    User show(int id) throws SQLException;
+    User show(int id);
     void save(User user);
-    Optional<User> show(String email);
-
-    void update(int id, User user) throws SQLException;
+    void update(int id, User user);
     void delete(int id);
 }

@@ -1,61 +1,53 @@
 package ru.trofimets.crud_dao.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.trofimets.crud_dao.model.User;
-
-
-import java.sql.*;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
-import java.util.Optional;
+
 
 @Component
 public class UserDAOImpl implements UserDAO {
 
-    private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public UserDAOImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    @PersistenceContext
+    private EntityManager entityManager;
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<User> index() {
-        return jdbcTemplate.query("SELECT * FROM User", new BeanPropertyRowMapper<>(User.class));
+        return entityManager.createQuery("select u FROM User u", User.class).getResultList();
 
     }
 
     @Override
-    public User show(int id) throws SQLException {
-        return jdbcTemplate.query("SELECT * FROM User WHERE id=?", new Object[]{id}, new BeanPropertyRowMapper<>(User.class))
-                .stream().findAny().orElse(null);
+    @Transactional(readOnly = true)
+    public User show(int id) {
+        return entityManager.find(User.class,id);
     }
 
     @Override
-    public Optional<User> show(String email) {
-        return jdbcTemplate.query("SELECT * FROM User WHERE email=?", new Object[]{email}, new BeanPropertyRowMapper<>(User.class))
-                .stream().findAny();
-    }
-
-    @Override
+    @Transactional
     public void save(User user) {
-        jdbcTemplate.update("INSERT INTO User (name,surname,email) VALUES (?,?,?)", user.getName(), user.getSurname(), user.getEmail());
-
+        entityManager.persist(user);
     }
 
     @Override
+    @Transactional
     public void update(int id, User updateUser) {
-        jdbcTemplate.update("UPDATE User SET name = ?,surname = ?, email = ? WHERE id =?",
-                updateUser.getName(), updateUser.getSurname(), updateUser.getEmail(), id);
 
+        User user = entityManager.find(User.class,id);
+        user.setName(updateUser.getName());
+        user.setSurname(updateUser.getSurname());
+        user.setEmail(updateUser.getEmail());
+        entityManager.merge(user);
     }
 
     @Override
+    @Transactional
     public void delete(int id) {
-        jdbcTemplate.update("DELETE FROM User WHERE id = ?", id);
-
+        entityManager.remove(entityManager.find(User.class,id));
     }
 }

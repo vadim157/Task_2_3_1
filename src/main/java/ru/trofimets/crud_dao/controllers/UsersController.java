@@ -8,7 +8,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.trofimets.crud_dao.model.User;
 import ru.trofimets.crud_dao.service.UserService;
-import ru.trofimets.crud_dao.util.UserValidator;
+
 
 import javax.validation.Valid;
 import java.sql.SQLException;
@@ -19,12 +19,10 @@ import java.sql.SQLException;
 public class UsersController {
 
     private final UserService userService;
-    private final UserValidator userValidator;
 
     @Autowired
-    public UsersController(UserService userService, UserValidator userValidator) {
+    public UsersController(UserService userService) {
         this.userService = userService;
-        this.userValidator = userValidator;
     }
 
 
@@ -48,7 +46,6 @@ public class UsersController {
 
     @PostMapping
     public String create(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
-        userValidator.validate(user,bindingResult);
         if(bindingResult.hasErrors()){
             return "users/new";
         }
@@ -65,7 +62,6 @@ public class UsersController {
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("user") @Valid User user,BindingResult bindingResult, @PathVariable("id") int id) throws SQLException {
-        userValidator.validate(user,bindingResult);
         if(bindingResult.hasErrors()){
             return "users/edit";
         }

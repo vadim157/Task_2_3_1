@@ -1,13 +1,12 @@
 package ru.trofimets.crud_dao.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Component;
 import ru.trofimets.crud_dao.dao.UserDAO;
 import ru.trofimets.crud_dao.model.User;
-
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
+
 
 @Component
 public class UserServiceImpl implements UserService {
@@ -26,7 +25,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User show(int id) throws SQLException {
+    public User show(int id) {
         return userDAO.show(id);
     }
 
@@ -36,13 +35,9 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    @Override
-    public Optional<User> show(String email) {
-        return userDAO.show(email);
-    }
 
     @Override
-    public void update(int id, User user) throws SQLException {
+    public void update(int id, User user) {
         userDAO.update(id, user);
 
     }
