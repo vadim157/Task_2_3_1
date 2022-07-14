@@ -25,7 +25,6 @@ public class UsersController {
         this.userService = userService;
     }
 
-
     @GetMapping()
     public String index(Model model) {
         model.addAttribute("users", userService.index());
@@ -46,13 +45,12 @@ public class UsersController {
 
     @PostMapping
     public String create(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             return "users/new";
         }
         userService.save(user);
         return "redirect:/users/";
     }
-
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) throws SQLException {
@@ -61,20 +59,19 @@ public class UsersController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("user") @Valid User user,BindingResult bindingResult, @PathVariable("id") int id) throws SQLException {
-        if(bindingResult.hasErrors()){
+    public String update(@ModelAttribute("user") @Valid User user, BindingResult bindingResult, @PathVariable("id") int id) throws SQLException {
+        if (bindingResult.hasErrors()) {
             return "users/edit";
         }
         userService.update(id, user);
         return "redirect:/users";
     }
 
-        @GetMapping("/delete/{id}")
+    @GetMapping("/delete/{id}")
     public String remove(@ModelAttribute("id") int id) {
         userService.delete(id);
         return "redirect:/users/";
     }
-
 
     @DeleteMapping("/{id}")
     public String delete(@ModelAttribute("id") int id) {
